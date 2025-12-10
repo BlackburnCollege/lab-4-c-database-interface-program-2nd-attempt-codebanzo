@@ -2,9 +2,9 @@
 #include "sqlite3.h"
 
 #include "DatabaseManager.h"
-#include <limits> // Required for cin.ignore
+#include <limits>
 
-// --- Main Menu Display ---
+// --- Display ---
 void DatabaseManager::displayMenu() {
     std::cout << "\n============================================\n";
     std::cout << "          Movie Database Menu \n";
@@ -20,7 +20,7 @@ void DatabaseManager::displayMenu() {
 }
 
 int main() {
-    // Fulfills Requirement 4: Create at least 1 object of the self-defined class type.
+
     DatabaseManager dbManager;
 
     int choice = 0;
@@ -30,7 +30,7 @@ int main() {
         dbManager.displayMenu();
 
         if (!(std::cin >> choice)) {
-            // Handle bad input (like characters)
+
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             choice = 0;
@@ -38,7 +38,7 @@ int main() {
             continue;
         }
 
-        // Consume the rest of the line (newline character) after reading the integer
+
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         switch (choice) {
@@ -66,7 +66,7 @@ int main() {
             std::cout << "\nInvalid choice. Please select an option from 1 to 6.\n";
             break;
         }
-    } while (choice != 6); // Requirement 2: Continue displaying the menu until 'Exit'
+    } while (choice != 6);
 
     return 0;
 }

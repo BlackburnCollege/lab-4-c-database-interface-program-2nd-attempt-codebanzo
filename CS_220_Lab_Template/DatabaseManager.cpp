@@ -74,19 +74,19 @@ bool DatabaseManager::createDatabaseSchema() {
     char* zErrMsg = 0;
     int rc = sqlite3_exec(db, sql.c_str(), 0, 0, &zErrMsg);
     if (rc != SQLITE_OK) {
-        std::cerr << "SQL error during schema creation: " << zErrMsg << std::endl;
+        std::cerr << "SQL error during creation: " << zErrMsg << std::endl;
         sqlite3_free(zErrMsg);
         closeDatabase();
         return false;
     }
-    std::cout << "Database schema created successfully.\n";
+    std::cout << "Database schema done with success.\n";
     closeDatabase();
     return true;
 }
 
 bool DatabaseManager::importData() {
     if (!openDatabase()) return false;
-    std::cout << "\nAttempting to import data from CSV files...\n";
+    std::cout << "\nTrying to import data from CSV files...\n";
 
 #define EXEC_SQL(sql_string, current_table) \
         do { \
@@ -98,7 +98,7 @@ bool DatabaseManager::importData() {
                 } \
                 sqlite3_free(zErrMsg); \
             } else { \
-                imported_count++; \
+                importedCount++; \
             } \
         } while(0)
 
@@ -106,9 +106,9 @@ bool DatabaseManager::importData() {
         if (s.length() >= 2 && s.front() == '"' && s.back() == '"') s = s.substr(1, s.length() - 2);
         };
 
-    auto import_single_value_table = [&](const std::string& filename, const std::string& table, const std::string& id_col, const std::string& name_col) {
+    auto import_single_valueTable = [&](const std::string& filename, const std::string& table, const std::string& id_col, const std::string& name_col) {
         std::ifstream file(filename);
-        int imported_count = 0;
+        int importedCount = 0;
         if (file.is_open()) {
             std::string line;
             while (std::getline(file, line)) {
@@ -120,24 +120,24 @@ bool DatabaseManager::importData() {
                     EXEC_SQL(sql, table);
                 }
             }
-            std::cout << "Imported " << imported_count << " rows into " << table << " table successfully.\n";
+            std::cout << "Imported " << importedCount << " rows into " << table << " table successfully.\n";
             file.close();
         }
-        else { std::cerr << "ERROR: Could not open " << filename << ". Skipping " << table << " import.\n"; }
+        else { std::cerr << "NOOOOOOO: Could not open " << filename << ". Skipping " << table << " import.\n"; }
         };
 
-    import_single_value_table("Rating.csv", "Rating", "rating_id", "rating_name");
-    import_single_value_table("Country.csv", "Country", "country_id", "country_name");
-    import_single_value_table("Genre.csv", "Genre", "genre_id", "genre_name");
-    import_single_value_table("Person.csv", "Person", "Person_id", "Full_name");
-    import_single_value_table("Studio.csv", "Studio", "Studio_id", "Studio_name");
+    import_single_valueTable("Rating.csv", "Rating", "rating_id", "rating_name");
+    import_single_valueTable("Country.csv", "Country", "country_id", "country_name");
+    import_single_valueTable("Genre.csv", "Genre", "genre_id", "genre_name");
+    import_single_valueTable("Person.csv", "Person", "Person_id", "Full_name");
+    import_single_valueTable("Studio.csv", "Studio", "Studio_id", "Studio_name");
 
 
     // Movie
     std::ifstream movieFile("Movie.csv");
     if (movieFile.is_open()) {
         std::string line;
-        int imported_count = 0;
+        int importedCount = 0;
         const std::string table_name = "Movie";
         while (std::getline(movieFile, line)) {
             std::stringstream ss(line);
@@ -151,14 +151,14 @@ bool DatabaseManager::importData() {
                 EXEC_SQL(sql, table_name);
             }
         }
-        std::cout << "Imported " << imported_count << " rows into Movie table successfully.\n";
+        std::cout << "Imported " << importedCount << " rows into Movie table successfully.\n";
         movieFile.close();
     }
     else { std::cerr << "ERROR: Could not open Movie.csv. Skipping Movie import.\n"; }
 
     auto import_two_column_bridge = [&](const std::string& filename, const std::string& table, const std::string& col1, const std::string& col2) {
         std::ifstream file(filename);
-        int imported_count = 0;
+        int importedCount = 0;
         if (file.is_open()) {
             std::string line;
             while (std::getline(file, line)) {
@@ -166,10 +166,19 @@ bool DatabaseManager::importData() {
                 std::string val1, val2;
                 if (std::getline(ss, val1, ',') && std::getline(ss, val2)) {
                     std::string sql = "INSERT INTO " + table + " (" + col1 + ", " + col2 + ") VALUES (" + val1 + ", " + val2 + ");";
-                    EXEC_SQL(sql, table);
+                    do {
+                        char* zErrMsg = 0; int rc = sqlite3_exec(db, sql.c_str(), 0, 0, &zErrMsg); if (rc != 0) {
+                            if (rc != 19) {
+                                std::cerr << "SQL error on INSERT into " << table << ": " << zErrMsg << " (Query: " << sql << ")" << std::endl;
+                            } sqlite3_free(zErrMsg);
+                        }
+                        else {
+                            importedCount++;
+                        }
+                    } while (0);
                 }
             }
-            std::cout << "Imported " << imported_count << " rows into " << table << " table successfully.\n";
+            std::cout << "Import " << importedCount << " rows into " << table << " table done successfully.\n";
             file.close();
         }
         else { std::cerr << "ERROR: Could not open " << filename << ". Skipping " << table << " import.\n"; }
@@ -183,7 +192,7 @@ bool DatabaseManager::importData() {
     std::ifstream movieActorFile("MovieActor.csv");
     if (movieActorFile.is_open()) {
         std::string line;
-        int imported_count = 0;
+        int importedCount = 0;
         const std::string table_name = "MovieActor";
         while (std::getline(movieActorFile, line)) {
             std::stringstream ss(line);
@@ -195,7 +204,7 @@ bool DatabaseManager::importData() {
                 EXEC_SQL(sql, table_name);
             }
         }
-        std::cout << "Imported " << imported_count << " rows into MovieActor table successfully.\n";
+        std::cout << "Imported " << importedCount << " rows into MovieActor table successfully.\n";
         movieActorFile.close();
     }
     else { std::cerr << "ERROR: Could not open MovieActor.csv. Skipping MovieActor import.\n"; }

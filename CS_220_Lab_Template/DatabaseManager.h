@@ -7,12 +7,12 @@
 class DatabaseManager {
 private:
     sqlite3* db;
-    const std::string dbName = "movie_db.sqlite"; // The database file name
+    const std::string dbName = "movie_db.sqlite";
 
-    // Helper function to handle the sqlite3 callback for SELECT statements
+
     static int callback(void* data, int argc, char** argv, char** azColName);
 
-    // Internal functions to open and close the database connection
+    //open and close the database connection
     bool openDatabase();
     void closeDatabase();
 
@@ -21,7 +21,7 @@ public:
     DatabaseManager();
     ~DatabaseManager();
 
-    // Menu Functionality Implementations (Requirement 3: Each task in its own function)
+    // Menu Functios
     bool createDatabaseSchema();             // 1) Create Database
     bool importData();                       // 2) Import Data (Will read from your CSV files)
     void performSimpleQuery();               // 3) Simple SELECT
