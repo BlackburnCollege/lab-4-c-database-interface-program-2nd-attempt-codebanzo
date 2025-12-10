@@ -128,9 +128,28 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CS_220_Lab_Template.cpp" />
+    <ClCompile Include="DatabaseManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DatabaseManager.h" />
     <ClInclude Include="sqlite3.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="sqlite3.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Downloads\Country.csv" />
+    <None Include="..\..\..\..\Downloads\Genre.csv" />
+    <None Include="..\..\..\..\Downloads\Movie.csv" />
+    <None Include="..\..\..\..\Downloads\MovieActor.csv" />
+    <None Include="..\..\..\..\Downloads\MovieDirector.csv" />
+    <None Include="..\..\..\..\Downloads\MovieGenre.csv" />
+    <None Include="..\..\..\..\Downloads\MovieStudio.csv" />
+    <None Include="..\..\..\..\Downloads\Person.csv" />
+    <None Include="..\..\..\..\Downloads\Rating.csv" />
+    <None Include="..\..\..\..\Downloads\Studio.csv" />
+    <None Include="sqlite3.def" />
+    <None Include="sqlite3.dll" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
